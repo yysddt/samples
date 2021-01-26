@@ -8,6 +8,8 @@ int main()
     std::cout << "Hello World!\n";
 }
 
+#include <vector>
+#include <algorithm>
 #include <gsl/gsl>
 
 using namespace gsl;
@@ -72,4 +74,35 @@ void Eaxmple_C26429(not_null<int*> Ptr1, int* Ptr2) noexcept
 	}
 }
 
+[[gsl::suppress(r.5)]]
+[[gsl::suppress(f.6)]]
+void Example_span()
+{
+	auto SpanAccepter = [](span<int> Values)
+	{
+		if (Values.empty() || Values.size() < 5)
+			return;
 
+		at(Values, 1) = 1;
+
+		for (auto& Val : Values)
+			++Val;
+
+		auto Fn = [](auto) noexcept {};
+		std::for_each(Values.begin(), Values.end(), Fn);
+
+		const size_t Offset = 1;
+		const size_t Count = 3;
+		const auto SubValues = Values.subspan(Offset, Count);
+	};
+
+	int Values[] = { 1, 2, 3, 4 };
+	SpanAccepter(Values);
+
+	const size_t Size = 10;
+	auto Values2 = std::make_unique<int[]>(Size);
+	SpanAccepter({Values2.get(), Size});
+
+	std::vector<int> Values3;
+	SpanAccepter(Values3);
+}
