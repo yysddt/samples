@@ -2,14 +2,9 @@
 //
 
 #include <iostream>
-
-int main()
-{
-    std::cout << "Hello World!\n";
-}
-
 #include <vector>
 #include <algorithm>
+#include <functional>
 #include <gsl/gsl>
 
 using namespace gsl;
@@ -31,7 +26,7 @@ void Example_owner()
 	}
 }
 
-void Eaxmple_not_null(not_null<int*> Ptr1, int* Ptr2) noexcept
+void Example_not_null(not_null<int*> Ptr1, int* Ptr2) noexcept
 {
 	{	// Ok
 		*Ptr1 = 10;
@@ -80,4 +75,63 @@ void Example_zstring()
 {
 	const auto AcceptNullTerminatedString = [](czstring<>, zstring<>)	{};
 	AcceptNullTerminatedString("Test Message", std::make_unique<char[]>(20).get());
+}
+
+int Example_assertion(int Value)
+{
+	Expects(Value != 0);
+
+	int Result = Value * 0;
+	Ensures(Result == 0);
+
+	return Result;
+}
+
+void Example_index()
+{
+	int RawValueArray[] = { 0, 1, 2, 3 };
+	const span<int> ValueSpan = RawValueArray;
+
+	for (index i = 0; i < ValueSpan.size(); ++i)
+	{
+		// do something
+	}
+
+	std::vector<int> ValueVector = { 0, 1, 2, 3 };
+	
+	for (index i = 0; i < ValueVector.size(); ++i)
+	{
+		// do something
+	}
+}
+
+void Example_final_action()
+{
+	{
+		auto LambdaWork = []() { std::cout << "[lambda] end of scope\n"; };
+		final_action action(LambdaWork);
+	}
+
+	{
+		std::function<void()> FunctionWork = []() { std::cout << "[function] end of scope\n"; };
+		final_action action(FunctionWork);
+	}
+
+	{
+		struct Functor
+		{
+			void operator()() { std::cout << "[functor] end of scope\n"; }
+		};
+
+		final_action action(std::move(Functor()));
+	}
+
+	{
+		auto action = finally([]() { std::cout << "[lambda] finally end of scope\n"; });
+	}
+}
+
+int main()
+{
+	Example_final_action();
 }
