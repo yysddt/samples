@@ -141,8 +141,45 @@ void Example_final_action()
 	}
 }
 
+void Example_narrow()
+{
+	{
+		const double DoubleValue = -9.99;
+		std::cout << "DoubleValue(" << DoubleValue << ")\n";
+
+		float FloatValue = narrow_cast<float>(DoubleValue);
+		std::cout << "FloatValue(" << FloatValue << ")\n";
+
+		int IntValue = narrow_cast<int>(DoubleValue);
+		std::cout << "IntValue(" << IntValue << ")\n";
+
+		unsigned int UIntValue = narrow_cast<unsigned int>(DoubleValue);
+		std::cout << "UIntValue(" << UIntValue << ")\n";
+	}
+
+	try
+	{
+		const double DoubleValue = -9.99;
+
+		std::cout << "try cast to float\n";
+		const float FloatValue = narrow<float>(DoubleValue);
+
+		std::cout << "try cast to int\n";
+		const int IntValue = narrow<int>(DoubleValue);
+
+		std::cout << "try cast to uint\n";
+		const unsigned int UintValue = narrow<unsigned int>(FloatValue);
+	}
+	catch (const narrowing_error& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+
 int main()
 {
 	Example_not_null();
 	Example_final_action();
+	Example_narrow();
 }
