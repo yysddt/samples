@@ -26,14 +26,24 @@ void Example_owner()
 	}
 }
 
-void Example_not_null(not_null<int*> Ptr1, int* Ptr2) noexcept
+void Example_not_null() noexcept
 {
 	{	// Ok
-		*Ptr1 = 10;
+		int Value;
+		auto PtrAccepter = [](not_null<int*> Ptr) { *Ptr = 10; };
+		PtrAccepter(&Value);
+	}
+
+	{	// Ok
+		int Value;
+		auto PtrAccepter = [](strict_not_null<int*> Ptr) { *Ptr = 10; };
+		PtrAccepter(strict_not_null{ &Value });
 	}
 
 	{	// Error : Symbol 'Ptr2' is never tested for nullness, it can be marked as not_null(f.23).
-		*Ptr2 = 10;
+		int Value;
+		auto PtrAccepter = [](int* Ptr) { *Ptr = 10; };
+		PtrAccepter(&Value);
 	}
 }
 
@@ -133,5 +143,6 @@ void Example_final_action()
 
 int main()
 {
+	Example_not_null();
 	Example_final_action();
 }
